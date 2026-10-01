@@ -55,19 +55,115 @@ ticked. The table above is just a fast overview, tick the boxes inside each demo
 
 **Tasks**
 
-- [ ] Choose **npm** or **pnpm** and record why you picked it over the other.
-- [ ] Initialize `package.json` for the project (name, version, description, etc. filled in properly).
-- [ ] Add a `.gitignore` entry for `node_modules` (and any other tool output you generate in later demos, e.g. `dist/`).
-- [ ] Install one real dependency (you'll add more in later demos) and show the resulting lockfile (`package-lock.json` or `pnpm-lock.yaml`) committed to the repo.
+- [X] Choose **npm** or **pnpm** and record why you picked it over the other.
+
+pnpm because it works with the global content and hardlinks, thus installs faster. Strict node_modules prevents phantom dependi. and also pnpm-ocl.yaml for reporducity
+
+- [X] Initialize `package.json` for the project (name, version, description, etc. filled in properly).
+
+```Shell
+$ pnpm init
+
+$ cat package.json
+{
+  "name": "mystery-road-awe-2026",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.8.1",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "pnpm@12.8.1",
+  "type": "module"
+}
+```
+
+- [X] Add a `.gitignore` entry for `node_modules` (and any other tool output you generate in later demos, e.g. `dist/`).
+- [X] Install one real dependency (you'll add more in later demos) and show the resulting lockfile (`package-lock.json` or `pnpm-lock.yaml`) committed to the repo.
+
+```Shell
+$ pnpm add -D vite
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: C:\Users\chowe\AppData\Local\pnpm\store\v11
+  Virtual store is at:             node_modules/.pnpm
+Downloading @rolldown/binding-win32-x64-msvc@1.2.12: 8.13 MB/8.13 MB, done
+Packages: +15
++++++++++++++++
+Progress: resolved 15, reused 0, downloaded 15, added 15, done
+
+devDependencies:
++ vite 8.3.1
+
+Done in 7.5s using pnpm v12.8.1
+
+$ cat package.json
+{
+  "name": "mystery-road-awe-2026",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.8.1",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "pnpm@12.8.1",
+  "type": "module",
+  "devDependencies": {
+    "vite": "^8.3.1"
+  }
+}
+```
 
 **Questions** (depend on the tasks above)
 
 - [ ] What problem does a package manager actually solve that "download the library and put it in a folder yourself" doesn't? Be specific.
+
+* **Transitive dependencies:** Libraries depend on other libraries (Vite needs esbuild and rollup, which need more). The manager resolves the whole tree automatically. Manually I would have to find, download and place every single one.
+* **Versioning:** I declare version ranges (e.g. `^5.0.0`) and the manager picks compatible versions. A manually copied file carries no version information.
+* **Reproducibility:** A teammate runs one install command and gets the same setup, instead of following a list of files to download.
+* **Updates and security:** Updating is one command (`pnpm update`), and `pnpm audit` reports known vulnerabilities. Copied files have to be checked and replaced by hand.
+* **Clean repo:** Only `package.json` and the lockfile are committed, not thousands of library files.
+
 - [ ] What's the difference between `dependencies` and `devDependencies` in `package.json`? Which
   category will Vite, your linter/formatter, and TypeScript belong to, and why?
+
+* `dependencies`: packages whose code my app imports and needs at runtime. They are part of the final build.
+* `devDependencies`: packages needed only during development (checking, building). The user does not receive them, and they are skipped with `pnpm install --prod`.
+* All four tools below belong in `devDependencies`:
+  * Vite: build tool and dev server. In development it serves ES modules to the browser and supports hot module replacement. For production it bundles, minifies and hashes the source into static files in `dist/`.
+  * TypeScript: typed superset of JavaScript. It checks types and is compiled to JavaScript at  compile time, because browsers cannot run TypeScript. At runtime only the generated JavaScript exists.
+  * ESLint: static analysis of the source code. It finds problems before the code runs or is built.
+  * Prettier: rewrites source files into one consistent style. It runs in the editor, on the command line (`format`) and in CI (`--check`).
+
 - [ ] What is a lockfile for, and what could go wrong for your teammates (or CI) if it weren't
   committed to the repo?
+
+- version ranges, records exact version, inlcuding transitive ones.
+- wihtout lockfiel teammates and ci install different versions which might cause problems. For Build might break because of faulty dependency. for ci use `pnpm install --forzen-lockfile` it cehcks if lockfile matches package.json  or it fails
+
 - [ ] If you chose pnpm: what does it do differently from npm regarding how `node_modules` is laid out and how disk space/install time is shared across projects? If you chose npm: what would you gain or lose by switching to pnpm on a larger project?
+
+- Layout, flat packages direct dependencies symlinks
+- Disk spacen and install time, packages version are stored once in global content store, hardlinks, files are already in store and linked
 
 ---
 
