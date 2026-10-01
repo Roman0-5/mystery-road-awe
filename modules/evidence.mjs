@@ -1,9 +1,20 @@
 import { state } from "./state.mjs";
 import {
-  findEvidenceById, findPersonById, findLocationById, evidenceMentionsPerson,
-  formatDate, getStatusBadgeClass, getRelevanceBadgeClass, escapeHtml, fillSelect
+  findEvidenceById,
+  findPersonById,
+  findLocationById,
+  evidenceMentionsPerson,
+  formatDate,
+  getStatusBadgeClass,
+  getRelevanceBadgeClass,
+  escapeHtml,
+  fillSelect,
 } from "./utils.mjs";
-import { saveBookmarksToStorage, saveNoteForEvidence, loadNoteForEvidence } from "./storage.mjs";
+import {
+  saveBookmarksToStorage,
+  saveNoteForEvidence,
+  loadNoteForEvidence,
+} from "./storage.mjs";
 
 // ---------------------------------------------------------------------
 // FILTERING, SORTING & LIST
@@ -15,16 +26,36 @@ export const populateEvidenceDropdowns = () => {
   const locationSelect = document.getElementById("filterLocation");
   if (!typeSelect || !personSelect || !locationSelect) return;
 
-  const types = [...new Set(state.allEvidence.map((ev) => ev.type.toLowerCase()))];
-  fillSelect(typeSelect, "All types", types.map((t) => ({ value: t, label: t })));
-  fillSelect(personSelect, "All people", state.allPeople.map((p) => ({ value: p.id, label: p.name })));
-  fillSelect(locationSelect, "All locations", state.allLocations.map((l) => ({ value: l.id, label: l.id + " - " + l.name })));
+  const types = [
+    ...new Set(state.allEvidence.map((ev) => ev.type.toLowerCase())),
+  ];
+  fillSelect(
+    typeSelect,
+    "All types",
+    types.map((t) => ({ value: t, label: t })),
+  );
+  fillSelect(
+    personSelect,
+    "All people",
+    state.allPeople.map((p) => ({ value: p.id, label: p.name })),
+  );
+  fillSelect(
+    locationSelect,
+    "All locations",
+    state.allLocations.map((l) => ({
+      value: l.id,
+      label: l.id + " - " + l.name,
+    })),
+  );
 };
 
 const sortEvidence = (items, sortValue) => {
-  if (sortValue === "title-asc") return items.sort((a, b) => a.title.localeCompare(b.title));
-  if (sortValue === "title-desc") return items.sort((a, b) => b.title.localeCompare(a.title));
-  if (sortValue === "date-asc") return items.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  if (sortValue === "title-asc")
+    return items.sort((a, b) => a.title.localeCompare(b.title));
+  if (sortValue === "title-desc")
+    return items.sort((a, b) => b.title.localeCompare(a.title));
+  if (sortValue === "date-asc")
+    return items.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   return items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 };
 
@@ -43,14 +74,23 @@ const getFilteredEvidence = () => {
   // .filter() returns a NEW array, so sorting it below can never reorder state.allEvidence.
   const results = state.allEvidence.filter((item) => {
     if (searchTerm) {
-      const haystack = (item.title + " " + item.summary + " " + item.tags.join(" ")).toLowerCase();
+      const haystack = (
+        item.title +
+        " " +
+        item.summary +
+        " " +
+        item.tags.join(" ")
+      ).toLowerCase();
       if (!haystack.includes(searchTerm)) return false;
     }
     if (typeVal && item.type.toLowerCase() !== typeVal) return false;
-    if (personVal && (!person || !evidenceMentionsPerson(item, person))) return false;
+    if (personVal && (!person || !evidenceMentionsPerson(item, person)))
+      return false;
     if (locationVal && !item.locationIds.includes(locationVal)) return false;
-    if (statusVal && (item.status || "").toLowerCase() !== statusVal) return false;
-    if (relevanceVal && (item.relevance || "").toLowerCase() !== relevanceVal) return false;
+    if (statusVal && (item.status || "").toLowerCase() !== statusVal)
+      return false;
+    if (relevanceVal && (item.relevance || "").toLowerCase() !== relevanceVal)
+      return false;
     return true;
   });
 
@@ -85,16 +125,42 @@ export function renderEvidenceList() {
 const renderEvidenceCardHTML = (ev) => {
   const isBookmarked = state.bookmarks.includes(ev.id);
   let html = '<div class="evidence-card" data-id="' + ev.id + '">';
-  html += '<button class="bookmark-btn ' + (isBookmarked ? "active" : "") + '" data-action="bookmark" data-id="' + ev.id + '" aria-label="Toggle bookmark for ' + ev.title + '"><span class="bookmark-icon">' + (isBookmarked ? "★" : "☆") + "</span></button>";
+  html +=
+    '<button class="bookmark-btn ' +
+    (isBookmarked ? "active" : "") +
+    '" data-action="bookmark" data-id="' +
+    ev.id +
+    '" aria-label="Toggle bookmark for ' +
+    ev.title +
+    '"><span class="bookmark-icon">' +
+    (isBookmarked ? "★" : "☆") +
+    "</span></button>";
   html += "<h3>" + ev.title + "</h3>";
-  html += '<div class="evidence-meta">' + ev.id + " &middot; " + ev.type + " &middot; " + formatDate(ev.timestamp) + "</div>";
+  html +=
+    '<div class="evidence-meta">' +
+    ev.id +
+    " &middot; " +
+    ev.type +
+    " &middot; " +
+    formatDate(ev.timestamp) +
+    "</div>";
   html += '<div class="evidence-summary">' + ev.summary + "</div>";
 
   if (ev.tags.includes("critical")) {
     html += '<span class="badge badge-critical">Critical</span>';
   }
-  html += '<span class="badge ' + getStatusBadgeClass(ev.status) + '">' + ev.status + "</span>";
-  html += '<span class="badge ' + getRelevanceBadgeClass(ev.relevance) + '">' + ev.relevance + "</span>";
+  html +=
+    '<span class="badge ' +
+    getStatusBadgeClass(ev.status) +
+    '">' +
+    ev.status +
+    "</span>";
+  html +=
+    '<span class="badge ' +
+    getRelevanceBadgeClass(ev.relevance) +
+    '">' +
+    ev.relevance +
+    "</span>";
   html += "<div>";
   ev.tags.forEach((tag) => {
     html += '<span class="tag-chip">' + tag + "</span>";
@@ -213,26 +279,47 @@ const renderEvidenceDetail = (ev) => {
     return loc ? loc.id + " - " + loc.name : id;
   });
 
-  const tagsHtml = ev.tags.map((tag) => '<span class="tag-chip">' + tag + "</span>").join("");
+  const tagsHtml = ev.tags
+    .map((tag) => '<span class="tag-chip">' + tag + "</span>")
+    .join("");
 
   const storedNote = escapeHtml(loadNoteForEvidence(ev.id));
 
   let html = "";
   html += '<div class="evidence-detail-header">';
   html += "<div><h2>" + ev.title + "</h2>";
-  html += '<div class="evidence-meta">' + ev.id + " &middot; " + ev.type + " &middot; " + formatDate(ev.timestamp) + "</div></div>";
-  html += '<button type="button" class="btn btn-secondary btn-small" data-action="close-detail">Close</button>';
+  html +=
+    '<div class="evidence-meta">' +
+    ev.id +
+    " &middot; " +
+    ev.type +
+    " &middot; " +
+    formatDate(ev.timestamp) +
+    "</div></div>";
+  html +=
+    '<button type="button" class="btn btn-secondary btn-small" data-action="close-detail">Close</button>';
   html += "</div>";
 
   if (ev.tags.includes("critical")) {
-    html += '<div class="warning-banner">This item is tagged as critical evidence.</div>';
+    html +=
+      '<div class="warning-banner">This item is tagged as critical evidence.</div>';
   }
 
-  html += '<div class="detail-field"><strong>Summary</strong>' + ev.summary + "</div>";
+  html +=
+    '<div class="detail-field"><strong>Summary</strong>' +
+    ev.summary +
+    "</div>";
   html += '<div class="evidence-detail-content">' + ev.content + "</div>";
-  html += '<div class="detail-field"><strong>Related people</strong>' + personNames.join(", ") + "</div>";
-  html += '<div class="detail-field"><strong>Related locations</strong>' + locationNames.join(", ") + "</div>";
-  html += '<div class="detail-field"><strong>Tags</strong>' + tagsHtml + "</div>";
+  html +=
+    '<div class="detail-field"><strong>Related people</strong>' +
+    personNames.join(", ") +
+    "</div>";
+  html +=
+    '<div class="detail-field"><strong>Related locations</strong>' +
+    locationNames.join(", ") +
+    "</div>";
+  html +=
+    '<div class="detail-field"><strong>Tags</strong>' + tagsHtml + "</div>";
 
   html += '<div class="detail-field"><strong>Review status</strong>';
   html += '<select id="detailStatusSelect">';
@@ -249,24 +336,37 @@ const renderEvidenceDetail = (ev) => {
   html += "</select></div>";
 
   html += '<div class="detail-field"><strong>Investigator note</strong>';
-  html += '<textarea id="evidenceNoteInput" class="note-textarea" rows="3" data-evidence-id="' + ev.id + '" placeholder="Add a private note about this evidence...">' + storedNote + "</textarea>";
-  html += '<button type="button" class="btn btn-primary btn-small" style="margin-top:6px;" data-action="save-note">Save note</button>';
+  html +=
+    '<textarea id="evidenceNoteInput" class="note-textarea" rows="3" data-evidence-id="' +
+    ev.id +
+    '" placeholder="Add a private note about this evidence...">' +
+    storedNote +
+    "</textarea>";
+  html +=
+    '<button type="button" class="btn btn-primary btn-small" style="margin-top:6px;" data-action="save-note">Save note</button>';
   html += "</div>";
 
-  html += '<div class="detail-field"><strong>Note preview</strong><div id="notePreview">' + storedNote + "</div></div>";
+  html +=
+    '<div class="detail-field"><strong>Note preview</strong><div id="notePreview">' +
+    storedNote +
+    "</div></div>";
 
   section.innerHTML = html;
 
-  document.getElementById("detailStatusSelect").addEventListener("change", (e) => {
-    ev.status = e.target.value; // direct mutation of the loaded evidence object
-    renderEvidenceDetail(ev);
-    if (state.viewRendered.evidence) renderEvidenceList();
-  });
-  document.getElementById("detailRelevanceSelect").addEventListener("change", (e) => {
-    ev.relevance = e.target.value;
-    renderEvidenceDetail(ev);
-    if (state.viewRendered.evidence) renderEvidenceList();
-  });
+  document
+    .getElementById("detailStatusSelect")
+    .addEventListener("change", (e) => {
+      ev.status = e.target.value; // direct mutation of the loaded evidence object
+      renderEvidenceDetail(ev);
+      if (state.viewRendered.evidence) renderEvidenceList();
+    });
+  document
+    .getElementById("detailRelevanceSelect")
+    .addEventListener("change", (e) => {
+      ev.relevance = e.target.value;
+      renderEvidenceDetail(ev);
+      if (state.viewRendered.evidence) renderEvidenceList();
+    });
 };
 
 const statusOptionHTML = (current, value, label) => {

@@ -259,6 +259,26 @@ $ vite preview
 **Tasks**
 
 - [ ] Install and configure a linter (e.g. ESLint) and a formatter (e.g. Prettier) for this TypeScript/JS project.
+
+```bash
+$ pnpm add -D eslint @eslint/js globals prettier eslint-config-prettier
+✓ Lockfile passes supply-chain policies (verified 4h ago)
+[WARN] Request took 11364ms: https://registry.npmjs.org/ajv
+[WARN] Request took 10160ms: https://registry.npmjs.org/flat-cache
+Packages: +81
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 81, reused 0, downloaded 81, added 81, done
+
+devDependencies:
++ @eslint/js 10.0.1
++ eslint 10.11.0
++ eslint-config-prettier 10.1.8
++ globals 17.12.0
++ prettier 3.9.9
+
+Done in 22.7s using pnpm v12.8.1
+```
+
 - [ ] Add these scripts to `package.json`: `dev`, `build`, `lint`, `lint:fix`, `format`. Each one must actually do something real when run, not just print a placeholder.
 - [ ] Run `lint` and show it catching at least one real issue in your code (introduce one on purpose if you have to). Run `lint:fix` and/or `format` and show it actually changing a file.
 

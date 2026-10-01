@@ -2,13 +2,25 @@
 // Everything else lives in ./modules/ (state, data loading, storage, one module per view).
 import { state } from "./modules/state.mjs";
 import { navigateTo } from "./modules/navigation.mjs";
-import { loadBookmarksFromStorage, loadNotesFromStorage, loadNoteAsync } from "./modules/storage.mjs";
+import {
+  loadBookmarksFromStorage,
+  loadNotesFromStorage,
+  loadNoteAsync,
+} from "./modules/storage.mjs";
 import { loadAllData } from "./modules/data.mjs";
 import { renderDashboard } from "./modules/dashboard.mjs";
 import {
-  renderEvidenceList, handleEvidenceListClick, handleDetailClick, handleSearchInput, clearFilters
+  renderEvidenceList,
+  handleEvidenceListClick,
+  handleDetailClick,
+  handleSearchInput,
+  clearFilters,
 } from "./modules/evidence.mjs";
-import { renderPeople, renderLocations, switchPeopleTab } from "./modules/peoplelocations.mjs";
+import {
+  renderPeople,
+  renderLocations,
+  switchPeopleTab,
+} from "./modules/peoplelocations.mjs";
 import { renderTimeline } from "./modules/timeline.mjs";
 import { renderWorkspace, saveHypothesis } from "./modules/workspace.mjs";
 
@@ -16,7 +28,13 @@ import { renderWorkspace, saveHypothesis } from "./modules/workspace.mjs";
 // NAVIGATION / HASH ROUTING
 // ---------------------------------------------------------------------
 
-const VALID_VIEWS = ["dashboard", "evidence", "people", "timeline", "workspace"];
+const VALID_VIEWS = [
+  "dashboard",
+  "evidence",
+  "people",
+  "timeline",
+  "workspace",
+];
 
 const handleHashChange = () => {
   let hash = window.location.hash.replace("#", "");
@@ -25,7 +43,9 @@ const handleHashChange = () => {
   }
   state.currentPage = hash;
 
-  document.querySelectorAll(".view").forEach((section) => section.classList.remove("active"));
+  document
+    .querySelectorAll(".view")
+    .forEach((section) => section.classList.remove("active"));
   document.getElementById("view-" + hash).classList.add("active");
 
   document.querySelectorAll(".nav-btn").forEach((btn) => {
@@ -64,25 +84,51 @@ const setupEventListeners = () => {
     if (navEl) navigateTo(navEl.dataset.nav || navEl.dataset.view);
   });
 
-  document.getElementById("evidenceSearch").addEventListener("input", handleSearchInput);
+  document
+    .getElementById("evidenceSearch")
+    .addEventListener("input", handleSearchInput);
 
-  ["filterType", "filterPerson", "filterLocation", "filterStatus", "filterRelevance", "sortEvidence"].forEach((id) => {
+  [
+    "filterType",
+    "filterPerson",
+    "filterLocation",
+    "filterStatus",
+    "filterRelevance",
+    "sortEvidence",
+  ].forEach((id) => {
     document.getElementById(id).addEventListener("change", renderEvidenceList);
   });
-  document.getElementById("clearFiltersBtn").addEventListener("click", clearFilters);
+  document
+    .getElementById("clearFiltersBtn")
+    .addEventListener("click", clearFilters);
 
   // Delegated once here instead of on every re-render.
-  document.getElementById("evidenceList").addEventListener("click", handleEvidenceListClick);
-  document.getElementById("evidenceDetailSection").addEventListener("click", handleDetailClick);
+  document
+    .getElementById("evidenceList")
+    .addEventListener("click", handleEvidenceListClick);
+  document
+    .getElementById("evidenceDetailSection")
+    .addEventListener("click", handleDetailClick);
 
-  ["timelineOrder", "timelinePersonFilter", "timelineLocationFilter", "timelineTypeFilter"].forEach((id) => {
+  [
+    "timelineOrder",
+    "timelinePersonFilter",
+    "timelineLocationFilter",
+    "timelineTypeFilter",
+  ].forEach((id) => {
     document.getElementById(id).addEventListener("change", renderTimeline);
   });
 
-  document.getElementById("tabPeopleBtn").addEventListener("click", () => switchPeopleTab("people"));
-  document.getElementById("tabLocationsBtn").addEventListener("click", () => switchPeopleTab("locations"));
+  document
+    .getElementById("tabPeopleBtn")
+    .addEventListener("click", () => switchPeopleTab("people"));
+  document
+    .getElementById("tabLocationsBtn")
+    .addEventListener("click", () => switchPeopleTab("locations"));
 
-  document.getElementById("saveHypothesisBtn").addEventListener("click", saveHypothesis);
+  document
+    .getElementById("saveHypothesisBtn")
+    .addEventListener("click", saveHypothesis);
   document.getElementById("hypConfidence").addEventListener("input", (e) => {
     document.getElementById("hypConfidenceValue").textContent = e.target.value;
   });

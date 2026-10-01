@@ -19,10 +19,10 @@ export const state = {
 
   viewRendered: {
     evidence: false,
-    timeline: false
+    timeline: false,
   },
 
-  notesStore: {}
+  notesStore: {},
 };
 
 export const STORAGE_KEY_BOOKMARKS = "remotion_bookmarks";

@@ -1,5 +1,10 @@
 import { state } from "./state.mjs";
-import { findEvidenceById, findLocationById, formatDate, fillSelect } from "./utils.mjs";
+import {
+  findEvidenceById,
+  findLocationById,
+  formatDate,
+  fillSelect,
+} from "./utils.mjs";
 import { navigateTo } from "./navigation.mjs";
 import { openEvidenceDetail } from "./evidence.mjs";
 
@@ -9,11 +14,23 @@ export const populateTimelineDropdowns = () => {
   const typeSelect = document.getElementById("timelineTypeFilter");
   if (!personSelect || !locationSelect || !typeSelect) return;
 
-  fillSelect(personSelect, "All people", state.allPeople.map((p) => ({ value: p.id, label: p.name })));
-  fillSelect(locationSelect, "All locations", state.allLocations.map((l) => ({ value: l.id, label: l.id })));
+  fillSelect(
+    personSelect,
+    "All people",
+    state.allPeople.map((p) => ({ value: p.id, label: p.name })),
+  );
+  fillSelect(
+    locationSelect,
+    "All locations",
+    state.allLocations.map((l) => ({ value: l.id, label: l.id })),
+  );
 
   const types = [...new Set(state.allTimeline.map((evt) => evt.type))];
-  fillSelect(typeSelect, "All event types", types.map((t) => ({ value: t, label: t })));
+  fillSelect(
+    typeSelect,
+    "All event types",
+    types.map((t) => ({ value: t, label: t })),
+  );
 };
 
 const certaintyBadgeClass = (certainty) => {
@@ -29,13 +46,16 @@ export function renderTimeline() {
 
   const order = document.getElementById("timelineOrder").value;
   const personFilter = document.getElementById("timelinePersonFilter").value;
-  const locationFilter = document.getElementById("timelineLocationFilter").value;
+  const locationFilter = document.getElementById(
+    "timelineLocationFilter",
+  ).value;
   const typeFilter = document.getElementById("timelineTypeFilter").value;
 
   const events = state.allTimeline
     .filter((evt) => {
       if (personFilter && !evt.personIds.includes(personFilter)) return false;
-      if (locationFilter && !evt.locationIds.includes(locationFilter)) return false;
+      if (locationFilter && !evt.locationIds.includes(locationFilter))
+        return false;
       if (typeFilter && evt.type !== typeFilter) return false;
       return true;
     })
@@ -47,7 +67,14 @@ export function renderTimeline() {
   let html = "";
   events.forEach((item) => {
     html += '<div class="timeline-event certainty-' + item.certainty + '">';
-    html += '<div class="timeline-time">' + formatDate(item.time) + '&nbsp;&middot;&nbsp;<span class="badge badge-' + certaintyBadgeClass(item.certainty) + '">' + item.certainty + "</span></div>";
+    html +=
+      '<div class="timeline-time">' +
+      formatDate(item.time) +
+      '&nbsp;&middot;&nbsp;<span class="badge badge-' +
+      certaintyBadgeClass(item.certainty) +
+      '">' +
+      item.certainty +
+      "</span></div>";
     html += "<h3>" + item.title + "</h3>";
     html += "<p>" + item.description + "</p>";
 
@@ -56,11 +83,19 @@ export function renderTimeline() {
       return loc ? loc.id + " - " + loc.name : id;
     });
     if (eventLocationNames.length > 0) {
-      html += '<p class="evidence-meta">Location: ' + eventLocationNames.join(", ") + "</p>";
+      html +=
+        '<p class="evidence-meta">Location: ' +
+        eventLocationNames.join(", ") +
+        "</p>";
     }
 
     item.evidenceIds.forEach((evidenceId) => {
-      html += '<button type="button" class="evidence-link-btn" data-evidence-id="' + evidenceId + '">View ' + evidenceId + "</button>";
+      html +=
+        '<button type="button" class="evidence-link-btn" data-evidence-id="' +
+        evidenceId +
+        '">View ' +
+        evidenceId +
+        "</button>";
     });
     html += "</div>";
   });
@@ -80,7 +115,10 @@ export function renderTimeline() {
 
 const handleModalClick = (e) => {
   const modal = document.getElementById("quickViewModal");
-  if (e.target.classList.contains("modal-close-btn") || e.target.classList.contains("modal-backdrop")) {
+  if (
+    e.target.classList.contains("modal-close-btn") ||
+    e.target.classList.contains("modal-backdrop")
+  ) {
     modal.innerHTML = "";
   }
   if (e.target.getAttribute && e.target.getAttribute("data-open-full")) {
@@ -109,9 +147,21 @@ const openEvidenceModal = (evidenceId) => {
   modal.innerHTML =
     '<div class="modal-backdrop"><div class="modal-box">' +
     '<button type="button" class="modal-close-btn" aria-label="Close">&times;</button>' +
-    "<h3>" + ev.title + "</h3>" +
-    '<p class="evidence-meta">' + ev.id + " &middot; " + ev.type + " &middot; " + formatDate(ev.timestamp) + "</p>" +
-    "<p>" + ev.summary + "</p>" +
-    '<button type="button" class="btn btn-primary btn-small" data-open-full="' + ev.id + '">Open full evidence</button>' +
+    "<h3>" +
+    ev.title +
+    "</h3>" +
+    '<p class="evidence-meta">' +
+    ev.id +
+    " &middot; " +
+    ev.type +
+    " &middot; " +
+    formatDate(ev.timestamp) +
+    "</p>" +
+    "<p>" +
+    ev.summary +
+    "</p>" +
+    '<button type="button" class="btn btn-primary btn-small" data-open-full="' +
+    ev.id +
+    '">Open full evidence</button>' +
     "</div></div>";
 };

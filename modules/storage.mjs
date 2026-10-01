@@ -20,17 +20,22 @@ export const saveNoteForEvidence = (evidenceId, text) => {
   localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(state.notesStore));
 };
 
-export const loadNoteForEvidence = (evidenceId) => state.notesStore[evidenceId] || "";
+export const loadNoteForEvidence = (evidenceId) =>
+  state.notesStore[evidenceId] || "";
 
 export const loadNotesFromStorage = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_NOTES);
     const parsed = raw ? JSON.parse(raw) : {};
-    state.notesStore = parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+    state.notesStore =
+      parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? parsed
+        : {};
   } catch (err) {
     console.warn("Could not read stored notes, starting empty", err);
     state.notesStore = {};
   }
 };
 
-export const loadNoteAsync = async (evidenceId) => state.notesStore[evidenceId] || "";
+export const loadNoteAsync = async (evidenceId) =>
+  state.notesStore[evidenceId] || "";

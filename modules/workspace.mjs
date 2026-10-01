@@ -17,14 +17,21 @@ const renderBookmarksList = () => {
   const bookmarkedItems = state.allEvidence.filter((ev) => ev.bookmarked);
 
   if (bookmarkedItems.length === 0) {
-    container.innerHTML = "<p>No bookmarked evidence yet. Bookmark items from the Evidence view.</p>";
+    container.innerHTML =
+      "<p>No bookmarked evidence yet. Bookmark items from the Evidence view.</p>";
     return;
   }
 
   let html = "";
   bookmarkedItems.forEach((ev) => {
-    html += '<div class="mini-list-item"><strong>' + ev.id + "</strong> &mdash; " + ev.title +
-      ' <button type="button" class="btn btn-small btn-secondary" data-open-evidence="' + ev.id + '">Open</button></div>';
+    html +=
+      '<div class="mini-list-item"><strong>' +
+      ev.id +
+      "</strong> &mdash; " +
+      ev.title +
+      ' <button type="button" class="btn btn-small btn-secondary" data-open-evidence="' +
+      ev.id +
+      '">Open</button></div>';
   });
   container.innerHTML = html;
 
@@ -44,18 +51,33 @@ const renderNotesList = () => {
   if (!container) return;
 
   const noteEntries = state.allEvidence
-    .map((ev, index) => ({ index, evidenceId: ev.id, title: ev.title, text: state.notesStore[ev.id] }))
+    .map((ev, index) => ({
+      index,
+      evidenceId: ev.id,
+      title: ev.title,
+      text: state.notesStore[ev.id],
+    }))
     .filter((entry) => entry.text);
 
   if (noteEntries.length === 0) {
-    container.innerHTML = "<p>No notes yet. Add one from an evidence item's detail view.</p>";
+    container.innerHTML =
+      "<p>No notes yet. Add one from an evidence item's detail view.</p>";
     return;
   }
 
   let html = "";
   noteEntries.forEach((entry) => {
-    html += '<div class="mini-list-item"><strong>' + entry.evidenceId + "</strong> &mdash; " + entry.title;
-    html += '<div id="noteText-' + entry.index + '">' + escapeHtml(entry.text) + "</div></div>";
+    html +=
+      '<div class="mini-list-item"><strong>' +
+      entry.evidenceId +
+      "</strong> &mdash; " +
+      entry.title;
+    html +=
+      '<div id="noteText-' +
+      entry.index +
+      '">' +
+      escapeHtml(entry.text) +
+      "</div></div>";
   });
   container.innerHTML = html;
 };
@@ -65,7 +87,11 @@ export const populateHypothesisDropdowns = () => {
   const evidenceSelect = document.getElementById("hypEvidence");
   if (!suspectSelect || !evidenceSelect) return;
 
-  fillSelect(suspectSelect, "Select a person…", state.allPeople.map((p) => ({ value: p.id, label: p.name })));
+  fillSelect(
+    suspectSelect,
+    "Select a person…",
+    state.allPeople.map((p) => ({ value: p.id, label: p.name })),
+  );
 
   evidenceSelect.innerHTML = "";
   state.allEvidence.forEach((ev) => {
@@ -81,7 +107,7 @@ export const saveHypothesis = () => {
     confidence: document.getElementById("hypConfidence").value,
     explanation: document.getElementById("hypExplanation").value,
     alternative: document.getElementById("hypAlternative").value,
-    savedAt: new Date().toISOString()
+    savedAt: new Date().toISOString(),
   };
 
   try {
@@ -100,7 +126,9 @@ export const saveHypothesis = () => {
 };
 
 const getSelectedOptions = (selectEl) =>
-  [...selectEl.options].filter((option) => option.selected).map((option) => option.value);
+  [...selectEl.options]
+    .filter((option) => option.selected)
+    .map((option) => option.value);
 
 const readHypothesisFromStorage = () => {
   try {
@@ -120,7 +148,8 @@ const loadHypothesisFromStorage = () => {
   document.getElementById("hypSuspect").value = draft.suspectId || "";
   document.getElementById("hypNature").value = draft.nature || "";
   document.getElementById("hypConfidence").value = draft.confidence || 50;
-  document.getElementById("hypConfidenceValue").textContent = draft.confidence || 50;
+  document.getElementById("hypConfidenceValue").textContent =
+    draft.confidence || 50;
   document.getElementById("hypExplanation").value = draft.explanation || "";
   document.getElementById("hypAlternative").value = draft.alternative || "";
 
