@@ -25,11 +25,11 @@
       </div>
     </div>
     <nav class="main-nav" aria-label="Main navigation">
-      <button type="button" class="nav-btn" data-view="dashboard" onclick="navigateTo('dashboard')">Dashboard</button>
-      <button type="button" class="nav-btn" data-view="evidence" onclick="navigateTo('evidence')">Evidence</button>
-      <button type="button" class="nav-btn" data-view="people" onclick="navigateTo('people')">People &amp; Locations</button>
-      <button type="button" class="nav-btn" data-view="timeline" onclick="navigateTo('timeline')">Timeline</button>
-      <button type="button" class="nav-btn" data-view="workspace" onclick="navigateTo('workspace')">Workspace</button>
+      <button type="button" class="nav-btn" data-view="dashboard">Dashboard</button>
+      <button type="button" class="nav-btn" data-view="evidence">Evidence</button>
+      <button type="button" class="nav-btn" data-view="people">People &amp; Locations</button>
+      <button type="button" class="nav-btn" data-view="timeline">Timeline</button>
+      <button type="button" class="nav-btn" data-view="workspace">Workspace</button>
     </nav>
   </div>
 </header>
@@ -53,25 +53,25 @@
           <h4>1. Evidence Catalogue</h4>
           <p>Search, filter, and sort every evidence item. Open one for full details, related
           people and locations, and to add a private note.</p>
-          <button type="button" class="btn btn-secondary btn-small" onclick="navigateTo('evidence')">Go to Evidence</button>
+          <button type="button" class="btn btn-secondary btn-small" data-nav="evidence">Go to Evidence</button>
         </div>
         <div class="howto-item">
           <h4>2. People &amp; Locations</h4>
           <p>Read profiles and statements from the six team members involved, and look up the
           six key locations in the investigation.</p>
-          <button type="button" class="btn btn-secondary btn-small" onclick="navigateTo('people')">Go to People &amp; Locations</button>
+          <button type="button" class="btn btn-secondary btn-small" data-nav="people">Go to People &amp; Locations</button>
         </div>
         <div class="howto-item">
           <h4>3. Timeline</h4>
           <p>Walk through events in chronological order, filter by person, location, or type, and
           jump straight to the evidence behind any event.</p>
-          <button type="button" class="btn btn-secondary btn-small" onclick="navigateTo('timeline')">Go to Timeline</button>
+          <button type="button" class="btn btn-secondary btn-small" data-nav="timeline">Go to Timeline</button>
         </div>
         <div class="howto-item">
           <h4>4. Investigator Workspace</h4>
           <p>Your bookmarked evidence and notes collect here. Draft a hypothesis — who you
           suspect, why, and how confident you are — it's saved automatically in your browser.</p>
-          <button type="button" class="btn btn-secondary btn-small" onclick="navigateTo('workspace')">Go to Workspace</button>
+          <button type="button" class="btn btn-secondary btn-small" data-nav="workspace">Go to Workspace</button>
         </div>
       </div>
     </div>
@@ -123,7 +123,7 @@
         </select>
 
         <label for="sortEvidence" class="visually-hidden">Sort evidence</label>
-        <select id="sortEvidence" onchange="handleSortChange()">
+        <select id="sortEvidence">
           <option value="date-desc">Newest first</option>
           <option value="date-asc">Oldest first</option>
           <option value="title-asc">Title (A&ndash;Z)</option>
@@ -149,8 +149,8 @@
   <section id="view-people" class="view">
     <h2>People &amp; Locations</h2>
     <div class="tab-bar">
-      <button type="button" id="tabPeopleBtn" class="tab-btn active" onclick="switchPeopleTab('people')">People</button>
-      <button type="button" id="tabLocationsBtn" class="tab-btn" onclick="switchPeopleTab('locations')">Locations</button>
+      <button type="button" id="tabPeopleBtn" class="tab-btn active">People</button>
+      <button type="button" id="tabLocationsBtn" class="tab-btn">Locations</button>
     </div>
     <div id="peoplePanel" class="people-grid"></div>
     <div id="locationsPanel" class="locations-grid hidden"></div>
@@ -245,7 +245,7 @@
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn btn-primary" onclick="saveHypothesis()">Save hypothesis draft</button>
+          <button type="button" id="saveHypothesisBtn" class="btn btn-primary">Save hypothesis draft</button>
           <span id="hypothesisSavedMsg" class="saved-msg hidden">Saved</span>
         </div>
       </form>
@@ -258,6 +258,6 @@
   <p>Project ReMotion Investigation Portal &mdash; Research Center AI, Software and IT-Security of HCW (fictional case study)</p>
 </footer>
 
-<script src="app.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>
