@@ -152,7 +152,7 @@ $ cat package.json
   * Vite: build tool and dev server. In development it serves ES modules to the browser and supports hot module replacement. For production it bundles, minifies and hashes the source into static files in `dist/`.
   * TypeScript: typed superset of JavaScript. It checks types and is compiled to JavaScript at  compile time, because browsers cannot run TypeScript. At runtime only the generated JavaScript exists.
   * ESLint: static analysis of the source code. It finds problems before the code runs or is built.
-  * Prettier: rewrites source files into one consistent style. It runs in the editor, on the command line (`format`) and in CI (`--check`).
+  * Prettier: gitrewrites source files into one consistent style. It runs in the editor, on the command line (`format`) and in CI (`--check`).
 
 - [ ] What is a lockfile for, and what could go wrong for your teammates (or CI) if it weren't
   committed to the repo?
