@@ -1,4 +1,4 @@
-import { state } from "./state.mjs";
+import { state } from "./state.ts";
 import {
   findEvidenceById,
   findPersonById,
@@ -9,12 +9,12 @@ import {
   getRelevanceBadgeClass,
   escapeHtml,
   fillSelect,
-} from "./utils.mjs";
+} from "./utils.ts";
 import {
   saveBookmarksToStorage,
   saveNoteForEvidence,
   loadNoteForEvidence,
-} from "./storage.mjs";
+} from "./storage.ts";
 
 // ---------------------------------------------------------------------
 // FILTERING, SORTING & LIST

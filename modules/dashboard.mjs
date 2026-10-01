@@ -1,5 +1,5 @@
-import { state } from "./state.mjs";
-import { formatDate, getStatusBadgeClass } from "./utils.mjs";
+import { state } from "./state.ts";
+import { formatDate, getStatusBadgeClass } from "./utils.ts";
 
 const statCardHTML = (value, label) =>
   '<div class="stat-card"><div class="stat-value">' +

@@ -1,12 +1,12 @@
 // Entry point: wires up navigation and event listeners, then loads the data.
 // Everything else lives in ./modules/ (state, data loading, storage, one module per view).
-import { state } from "./modules/state.mjs";
+import { state } from "./modules/state.ts";
 import { navigateTo } from "./modules/navigation.mjs";
 import {
   loadBookmarksFromStorage,
   loadNotesFromStorage,
   loadNoteAsync,
-} from "./modules/storage.mjs";
+} from "./modules/storage.ts";
 import { loadAllData } from "./modules/data.mjs";
 import { renderDashboard } from "./modules/dashboard.mjs";
 import {

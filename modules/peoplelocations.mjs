@@ -1,5 +1,5 @@
-import { state } from "./state.mjs";
-import { evidenceMentionsPerson } from "./utils.mjs";
+import { state } from "./state.ts";
+import { evidenceMentionsPerson } from "./utils.ts";
 import { navigateTo } from "./navigation.mjs";
 import { renderEvidenceList } from "./evidence.mjs";
 

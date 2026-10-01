@@ -1,10 +1,10 @@
-import { state } from "./state.mjs";
+import { state } from "./state.ts";
 import {
   findEvidenceById,
   findLocationById,
   formatDate,
   fillSelect,
-} from "./utils.mjs";
+} from "./utils.ts";
 import { navigateTo } from "./navigation.mjs";
 import { openEvidenceDetail } from "./evidence.mjs";
 

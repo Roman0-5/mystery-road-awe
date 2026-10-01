@@ -1,5 +1,5 @@
-import { state, STORAGE_KEY_HYPOTHESIS } from "./state.mjs";
-import { escapeHtml, fillSelect } from "./utils.mjs";
+import { state, STORAGE_KEY_HYPOTHESIS } from "./state.ts";
+import { escapeHtml, fillSelect } from "./utils.ts";
 import { navigateTo } from "./navigation.mjs";
 import { openEvidenceDetail } from "./evidence.mjs";
 
