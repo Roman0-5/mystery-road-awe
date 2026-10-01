@@ -1,3 +1,17 @@
+$ pnpm dev
+$ vite
+
+  VITE v8.3.1  ready in 1742 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+00:15:04 [vite] (client) hmr update /styles.css?direct
+00:15:29 [vite] (client) hmr update /styles.css?direct (x2)
+00:21:26 [vite] (client) page reload modules/workspace.mjs
+00:21:40 [vite] (client) page reload modules/workspace.mjs (x2)
+00:22:00 [vite] (client) page reload modules/workspace.mjs (x3)
+
 # Exercise 2 — Build Tooling, TypeScript & CI/CD
 
 This is the second exercise in Advanced Web Engineering Course (CSDC). It builds directly on
@@ -172,6 +186,23 @@ $ cat package.json
 **Tasks**
 
 - [ ] Install Vite and configure it for this project (restructure files if needed so Vite can find `index.html`/your modules/the `data/` and `assets/` folders correctly).
+
+```Shell
+$ pnpm dev
+$ vite
+
+  VITE v8.3.1  ready in 1742 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+00:15:04 [vite] (client) hmr update /styles.css?direct
+00:15:29 [vite] (client) hmr update /styles.css?direct (x2)
+00:21:26 [vite] (client) page reload modules/workspace.mjs
+00:21:40 [vite] (client) page reload modules/workspace.mjs (x2)
+00:22:00 [vite] (client) page reload modules/workspace.mjs (x3)
+```
+
 - [ ] Get `vite`'s dev server running the app with the same functionality it had before. Verify every view still works, not just that the page loads.
 - [ ] Trigger Hot Module Replacement at least once: change something in the running app's source and observe the update happen without a full page reload.
 
@@ -188,12 +219,36 @@ $ cat package.json
 **Tasks**
 
 - [ ] Run the production build (`vite build`) and inspect the generated `dist/` folder.
+
+```Shell
+$ pnpm build
+$ vite build
+vite v8.3.1 building client environment for production...
+✓ 15 modules transformed.
+computing gzip size...
+dist/index.html                 10.44 kB │ gzip: 2.69 kB
+dist/assets/index-wrRc08Dm.css  11.44 kB │ gzip: 2.77 kB
+dist/assets/index-DIo-KyL8.js   20.98 kB │ gzip: 6.07 kB
+
+✓ built in 445ms
+```
+
 - [ ] Serve that build locally with `vite preview` (not the dev server) and confirm the app still works end-to-end from the built output.
+
+```bash
+$ pnpm preview
+$ vite preview
+  ➜  Local:   http://localhost:4173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+
+```
+
 - [ ] Compare the dev-mode source with the built output for at least one file: note what changed (filenames, size, formatting/minification).
 
 **Questions** (depend on the tasks above)
 
-- [ ] Name at least three concrete transformations Vite applied to your source when building for production (e.g. bundling, minification, hashed filenames. Pick the ones you actually observed).
+- [ ] Name at least three concrete transformations Vite applied to your source when building for production (e.g. bundling, minification, hashed filenames. Pick the ones you actually observed[s]()).
 - [ ] Why do production filenames typically include a content hash? What problem does that solve for real deployments?
 - [ ] Why would you never want to deploy the dev server itself (`vite dev`/`vite`) to real users, even though it "works"?
 
