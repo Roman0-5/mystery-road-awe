@@ -80,7 +80,3 @@ export const getEl = <T extends HTMLElement = HTMLElement>(
   }
   return el;
 };
-
-// DEMO 10: deliberate type error to show the deploy workflow failing at the Build step.
-// Remove this line again in the "fix" commit.
-export const deliberateTypeError: number = "not a number";
