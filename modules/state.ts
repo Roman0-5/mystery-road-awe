@@ -1,4 +1,11 @@
-import type { Evidence, Person, Location, TimelineEvent, PeopleTab } from "./types.ts";
+import type {
+  Evidence,
+  Person,
+  Location,
+  TimelineEvent,
+  CaseData,
+  PeopleTab,
+} from "./types.ts";
 
 interface AppState {
   allEvidence: Evidence[];
@@ -10,7 +17,7 @@ interface AppState {
   allPeople: Person[];
   allLocations: Location[];
   allTimeline: TimelineEvent[];
-  caseData: Record<string, unknown>; // Platzhalter, in Demo 6 echtes Interface
+  caseData: CaseData | null;
 
   currentPeopleTab: PeopleTab;
   loadingStepsRemaining: number;
@@ -30,7 +37,7 @@ export const state: AppState = {
   allPeople: [],
   allLocations: [],
   allTimeline: [],
-  caseData: {},
+  caseData: null,
 
   currentPeopleTab: "people",
   loadingStepsRemaining: 2,

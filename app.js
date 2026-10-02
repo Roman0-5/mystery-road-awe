@@ -7,7 +7,7 @@ import {
   loadNotesFromStorage,
   loadNoteAsync,
 } from "./modules/storage.ts";
-import { loadAllData } from "./modules/data.mjs";
+import { loadAllData } from "./modules/data.ts";
 import { renderDashboard } from "./modules/dashboard.mjs";
 import {
   renderEvidenceList,

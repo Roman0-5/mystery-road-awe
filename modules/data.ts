@@ -1,4 +1,13 @@
 import { state } from "./state.ts";
+import type {
+  CaseData,
+  Evidence,
+  EvidenceRelevance,
+  EvidenceStatus,
+  Location,
+  Person,
+  TimelineEvent,
+} from "./types.ts";
 import { renderDashboard } from "./dashboard.mjs";
 import {
   populateEvidenceDropdowns,
@@ -13,7 +22,7 @@ import { renderPeople } from "./peoplelocations.mjs";
 // LOADING OVERLAY
 // ---------------------------------------------------------------------
 
-const showLoadingOverlay = (msg) => {
+const showLoadingOverlay = (msg: string): void => {
   const overlay = document.getElementById("loadingOverlay");
   const text = document.getElementById("loadingText");
   if (text) text.textContent = msg;
@@ -38,17 +47,35 @@ const populateAllDropdowns = () => {
 // DATA LOADING
 // ---------------------------------------------------------------------
 
-const fetchJson = async (url) => {
+// The type parameter is a promise, not a guarantee: TypeScript cannot check what the JSON file
+// actually contains at runtime. Callers must normalise anything the file may get wrong.
+const fetchJson = async <T>(url: string): Promise<T> => {
   const res = await fetch(url);
-  return res.json();
+  return (await res.json()) as T;
 };
+
+// evidence.json mixes casings ("Reviewed", "Unknown", "Test-Report"). The app already compared
+// everything with toLowerCase(); now that status/relevance are union types we decide once, here:
+// lowercase is the canonical form.
+type RawEvidence = Omit<Evidence, "type" | "status" | "relevance"> & {
+  type: string;
+  status: string;
+  relevance: string;
+};
+
+const normalizeEvidence = (raw: RawEvidence): Evidence => ({
+  ...raw,
+  type: raw.type.toLowerCase(),
+  status: raw.status.toLowerCase() as EvidenceStatus,
+  relevance: raw.relevance.toLowerCase() as EvidenceRelevance,
+});
 
 // Sequential on purpose (parallelising is a later exercise): each file is only requested
 // after the previous one has been fetched and parsed.
 const loadCorePeopleAndLocations = async () => {
-  state.caseData = await fetchJson("data/case.json");
-  state.allPeople = await fetchJson("data/people.json");
-  state.allLocations = await fetchJson("data/locations.json");
+  state.caseData = await fetchJson<CaseData>("data/case.json");
+  state.allPeople = await fetchJson<Person[]>("data/people.json");
+  state.allLocations = await fetchJson<Location[]>("data/locations.json");
 
   hideLoadingStep();
   renderDashboard();
@@ -57,7 +84,8 @@ const loadCorePeopleAndLocations = async () => {
 
 const loadEvidenceData = async () => {
   try {
-    state.allEvidence = await fetchJson("data/evidence.json");
+    const raw = await fetchJson<RawEvidence[]>("data/evidence.json");
+    state.allEvidence = raw.map(normalizeEvidence);
     applyStoredBookmarkFlags();
     state.filteredEvidence = [...state.allEvidence]; // a copy, never an alias of allEvidence
     renderDashboard();
@@ -76,7 +104,7 @@ const loadEvidenceData = async () => {
 
 const loadTimelineData = async () => {
   try {
-    state.allTimeline = await fetchJson("data/timeline.json");
+    state.allTimeline = await fetchJson<TimelineEvent[]>("data/timeline.json");
     renderDashboard();
     if (state.currentPage === "timeline") renderTimeline();
     populateAllDropdowns();
