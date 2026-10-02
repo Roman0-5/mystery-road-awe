@@ -17,6 +17,7 @@ export interface Evidence {
   tags: string[];
   status: EvidenceStatus;
   relevance: EvidenceRelevance;
+  bookmarked?: boolean; // set at runtime from localStorage, not in the JSON
 }
 
 export interface Person {

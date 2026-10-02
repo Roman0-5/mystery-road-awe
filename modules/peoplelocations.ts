@@ -1,14 +1,15 @@
 import { state } from "./state.ts";
-import { evidenceMentionsPerson } from "./utils.ts";
-import { navigateTo } from "./navigation.mjs";
-import { renderEvidenceList } from "./evidence.mjs";
+import type { Person, PeopleTab } from "./types.ts";
+import { evidenceMentionsPerson, getEl } from "./utils.ts";
+import { navigateTo } from "./navigation.ts";
+import { renderEvidenceList } from "./evidence.ts";
 
-export const switchPeopleTab = (tab) => {
+export const switchPeopleTab = (tab: PeopleTab): void => {
   state.currentPeopleTab = tab;
-  const peoplePanel = document.getElementById("peoplePanel");
-  const locationsPanel = document.getElementById("locationsPanel");
-  const peopleTabBtn = document.getElementById("tabPeopleBtn");
-  const locationsTabBtn = document.getElementById("tabLocationsBtn");
+  const peoplePanel = getEl("peoplePanel");
+  const locationsPanel = getEl("locationsPanel");
+  const peopleTabBtn = getEl("tabPeopleBtn");
+  const locationsTabBtn = getEl("tabLocationsBtn");
 
   if (tab === "people") {
     peoplePanel.classList.remove("hidden");
@@ -23,11 +24,11 @@ export const switchPeopleTab = (tab) => {
   }
 };
 
-const countEvidenceForPerson = (person) =>
+const countEvidenceForPerson = (person: Person): number =>
   state.allEvidence.filter((ev) => evidenceMentionsPerson(ev, person)).length;
 
-export function renderPeople() {
-  const container = document.getElementById("peoplePanel");
+export function renderPeople(): void {
+  const container = getEl("peoplePanel");
   let html = "";
   state.allPeople.forEach((person) => {
     const count = countEvidenceForPerson(person);
@@ -73,8 +74,9 @@ export function renderPeople() {
 
   container.querySelectorAll(".evidence-count-link").forEach((link) => {
     link.addEventListener("click", (e) => {
-      const personId = e.target.getAttribute("data-person-id");
-      document.getElementById("filterPerson").value = personId;
+      if (!(e.target instanceof HTMLElement)) return;
+      const personId = e.target.dataset.personId ?? "";
+      getEl("filterPerson", HTMLSelectElement).value = personId;
       navigateTo("evidence");
       setTimeout(() => {
         renderEvidenceList();
@@ -83,8 +85,8 @@ export function renderPeople() {
   });
 }
 
-export function renderLocations() {
-  const container = document.getElementById("locationsPanel");
+export function renderLocations(): void {
+  const container = getEl("locationsPanel");
   let html = "";
   state.allLocations.forEach((loc) => {
     html += '<div class="location-card">';

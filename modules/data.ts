@@ -8,15 +8,15 @@ import type {
   Person,
   TimelineEvent,
 } from "./types.ts";
-import { renderDashboard } from "./dashboard.mjs";
+import { renderDashboard } from "./dashboard.ts";
 import {
   populateEvidenceDropdowns,
   applyStoredBookmarkFlags,
   renderEvidenceList,
-} from "./evidence.mjs";
-import { populateTimelineDropdowns, renderTimeline } from "./timeline.mjs";
-import { populateHypothesisDropdowns } from "./workspace.mjs";
-import { renderPeople } from "./peoplelocations.mjs";
+} from "./evidence.ts";
+import { populateTimelineDropdowns, renderTimeline } from "./timeline.ts";
+import { populateHypothesisDropdowns } from "./workspace.ts";
+import { renderPeople } from "./peoplelocations.ts";
 
 // ---------------------------------------------------------------------
 // LOADING OVERLAY

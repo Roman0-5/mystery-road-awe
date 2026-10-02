@@ -12,9 +12,7 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
-    "skipLibCheck": true,
-
-    "allowJs": true
+    "skipLibCheck": true
   },
-  "include": ["app.js", "modules", "eslint.config.ts"]
+  "include": ["app.ts", "modules", "eslint.config.ts"]
 }

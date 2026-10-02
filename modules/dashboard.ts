@@ -1,14 +1,14 @@
 import { state } from "./state.ts";
 import { formatDate, getStatusBadgeClass } from "./utils.ts";
 
-const statCardHTML = (value, label) =>
+const statCardHTML = (value: number, label: string): string =>
   '<div class="stat-card"><div class="stat-value">' +
   value +
   '</div><div class="stat-label">' +
   label +
   "</div></div>";
 
-export function renderDashboard() {
+export function renderDashboard(): void {
   const container = document.getElementById("dashboardContent");
   if (!container) return;
 
@@ -21,8 +21,13 @@ export function renderDashboard() {
     caseData,
   } = state;
 
+  // caseData is null until case.json has loaded; the dashboard is re-rendered once it arrives.
+  const caseTitle = caseData?.title ?? "Case";
+  const caseStatus = caseData?.status ?? "unknown";
+  const caseSummary = caseData?.summary ?? "";
+
   const reviewedCount = allEvidence.filter(
-    (ev) => (ev.status || "").toLowerCase() === "reviewed",
+    (ev) => ev.status === "reviewed",
   ).length;
   const progressPct =
     allEvidence.length === 0
@@ -31,12 +36,12 @@ export function renderDashboard() {
 
   let html = "";
   html += '<div class="case-summary-card">';
-  html += "<h3>" + (caseData.title || "Case") + "</h3>";
+  html += "<h3>" + caseTitle + "</h3>";
   html +=
     '<p><span class="badge badge-flagged">' +
-    (caseData.status || "unknown").toUpperCase() +
+    caseStatus.toUpperCase() +
     "</span></p>";
-  html += "<p>" + (caseData.summary || "") + "</p>";
+  html += "<p>" + caseSummary + "</p>";
   html += "</div>";
 
   html += '<div class="stat-grid">';

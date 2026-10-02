@@ -1,4 +1,5 @@
 import { state } from "./state.ts";
+import type { Evidence, EvidenceRelevance, EvidenceStatus } from "./types.ts";
 import {
   findEvidenceById,
   findPersonById,
@@ -9,6 +10,7 @@ import {
   getRelevanceBadgeClass,
   escapeHtml,
   fillSelect,
+  getEl,
 } from "./utils.ts";
 import {
   saveBookmarksToStorage,
@@ -20,15 +22,18 @@ import {
 // FILTERING, SORTING & LIST
 // ---------------------------------------------------------------------
 
-export const populateEvidenceDropdowns = () => {
+export const populateEvidenceDropdowns = (): void => {
   const typeSelect = document.getElementById("filterType");
   const personSelect = document.getElementById("filterPerson");
   const locationSelect = document.getElementById("filterLocation");
-  if (!typeSelect || !personSelect || !locationSelect) return;
+  if (
+    !(typeSelect instanceof HTMLSelectElement) ||
+    !(personSelect instanceof HTMLSelectElement) ||
+    !(locationSelect instanceof HTMLSelectElement)
+  )
+    return;
 
-  const types = [
-    ...new Set(state.allEvidence.map((ev) => ev.type.toLowerCase())),
-  ];
+  const types = [...new Set(state.allEvidence.map((ev) => ev.type))];
   fillSelect(
     typeSelect,
     "All types",
@@ -49,25 +54,28 @@ export const populateEvidenceDropdowns = () => {
   );
 };
 
-const sortEvidence = (items, sortValue) => {
+const timeOf = (ev: Evidence): number => new Date(ev.timestamp).getTime();
+
+const sortEvidence = (items: Evidence[], sortValue: string): Evidence[] => {
   if (sortValue === "title-asc")
     return items.sort((a, b) => a.title.localeCompare(b.title));
   if (sortValue === "title-desc")
     return items.sort((a, b) => b.title.localeCompare(a.title));
   if (sortValue === "date-asc")
-    return items.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-  return items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    return items.sort((a, b) => timeOf(a) - timeOf(b));
+  return items.sort((a, b) => timeOf(b) - timeOf(a));
 };
 
-const getFilteredEvidence = () => {
-  const searchBox = document.getElementById("evidenceSearch");
-  const searchTerm = searchBox ? searchBox.value.toLowerCase().trim() : "";
-  const typeVal = document.getElementById("filterType").value;
-  const personVal = document.getElementById("filterPerson").value;
-  const locationVal = document.getElementById("filterLocation").value;
-  const statusVal = document.getElementById("filterStatus").value;
-  const relevanceVal = document.getElementById("filterRelevance").value;
-  const sortValue = document.getElementById("sortEvidence").value;
+const getFilteredEvidence = (): Evidence[] => {
+  const searchTerm = getEl("evidenceSearch", HTMLInputElement)
+    .value.toLowerCase()
+    .trim();
+  const typeVal = getEl("filterType", HTMLSelectElement).value;
+  const personVal = getEl("filterPerson", HTMLSelectElement).value;
+  const locationVal = getEl("filterLocation", HTMLSelectElement).value;
+  const statusVal = getEl("filterStatus", HTMLSelectElement).value;
+  const relevanceVal = getEl("filterRelevance", HTMLSelectElement).value;
+  const sortValue = getEl("sortEvidence", HTMLSelectElement).value;
 
   const person = personVal ? findPersonById(personVal) : null;
 
@@ -83,14 +91,12 @@ const getFilteredEvidence = () => {
       ).toLowerCase();
       if (!haystack.includes(searchTerm)) return false;
     }
-    if (typeVal && item.type.toLowerCase() !== typeVal) return false;
+    if (typeVal && item.type !== typeVal) return false;
     if (personVal && (!person || !evidenceMentionsPerson(item, person)))
       return false;
     if (locationVal && !item.locationIds.includes(locationVal)) return false;
-    if (statusVal && (item.status || "").toLowerCase() !== statusVal)
-      return false;
-    if (relevanceVal && (item.relevance || "").toLowerCase() !== relevanceVal)
-      return false;
+    if (statusVal && item.status !== statusVal) return false;
+    if (relevanceVal && item.relevance !== relevanceVal) return false;
     return true;
   });
 
@@ -98,7 +104,7 @@ const getFilteredEvidence = () => {
   return state.filteredEvidence;
 };
 
-export function renderEvidenceList() {
+export function renderEvidenceList(): void {
   const container = document.getElementById("evidenceList");
   if (!container) return;
 
@@ -122,7 +128,7 @@ export function renderEvidenceList() {
   container.innerHTML = html;
 }
 
-const renderEvidenceCardHTML = (ev) => {
+const renderEvidenceCardHTML = (ev: Evidence): string => {
   const isBookmarked = state.bookmarks.includes(ev.id);
   let html = '<div class="evidence-card" data-id="' + ev.id + '">';
   html +=
@@ -170,23 +176,26 @@ const renderEvidenceCardHTML = (ev) => {
   return html;
 };
 
-// Registered ONCE on #evidenceList (see app.js): event delegation for card clicks / bookmark button.
-export const handleEvidenceListClick = (event) => {
+// Registered ONCE on #evidenceList (see app.ts): event delegation for card clicks / bookmark button.
+export const handleEvidenceListClick = (event: MouseEvent): void => {
+  if (!(event.target instanceof Element)) return;
   // closest(): the click may land on the <span> star inside the button, not on the button itself.
-  const bookmarkBtn = event.target.closest('[data-action="bookmark"]');
+  const bookmarkBtn = event.target.closest<HTMLElement>(
+    '[data-action="bookmark"]',
+  );
   if (bookmarkBtn) {
     event.stopPropagation();
-    handleBookmarkClick(bookmarkBtn.dataset.id);
+    handleBookmarkClick(bookmarkBtn.dataset.id ?? "");
     return;
   }
 
-  const card = event.target.closest(".evidence-card");
+  const card = event.target.closest<HTMLElement>(".evidence-card");
   if (card) {
-    openEvidenceDetail(card.getAttribute("data-id"));
+    openEvidenceDetail(card.dataset.id ?? "");
   }
 };
 
-const handleBookmarkClick = (evidenceId) => {
+const handleBookmarkClick = (evidenceId: string): void => {
   const ev = findEvidenceById(evidenceId);
   if (!ev) return;
 
@@ -201,30 +210,31 @@ const handleBookmarkClick = (evidenceId) => {
   if (state.currentPage === "evidence") renderEvidenceList();
 };
 
-export const applyStoredBookmarkFlags = () => {
+export const applyStoredBookmarkFlags = (): void => {
   state.allEvidence.forEach((ev) => {
     ev.bookmarked = state.bookmarks.includes(ev.id);
   });
 };
 
-export const clearFilters = () => {
-  document.getElementById("evidenceSearch").value = "";
-  document.getElementById("filterType").value = "";
-  document.getElementById("filterPerson").value = "";
-  document.getElementById("filterLocation").value = "";
-  document.getElementById("filterStatus").value = "";
-  document.getElementById("filterRelevance").value = "";
+export const clearFilters = (): void => {
+  getEl("evidenceSearch", HTMLInputElement).value = "";
+  getEl("filterType", HTMLSelectElement).value = "";
+  getEl("filterPerson", HTMLSelectElement).value = "";
+  getEl("filterLocation", HTMLSelectElement).value = "";
+  getEl("filterStatus", HTMLSelectElement).value = "";
+  getEl("filterRelevance", HTMLSelectElement).value = "";
   renderEvidenceList();
 };
 
-const simulateAsyncSearch = (term) =>
+const simulateAsyncSearch = (term: string): Promise<string> =>
   new Promise((resolve) => {
     setTimeout(() => resolve(term), 300);
   });
 
 let latestSearchRequestId = 0;
 
-export const handleSearchInput = async (event) => {
+export const handleSearchInput = async (event: Event): Promise<void> => {
+  if (!(event.target instanceof HTMLInputElement)) return;
   const requestId = ++latestSearchRequestId;
 
   await simulateAsyncSearch(event.target.value);
@@ -238,36 +248,37 @@ export const handleSearchInput = async (event) => {
 // EVIDENCE DETAIL
 // ---------------------------------------------------------------------
 
-export const openEvidenceDetail = (evidenceId) => {
+export const openEvidenceDetail = (evidenceId: string): void => {
   const ev = findEvidenceById(evidenceId);
   if (!ev) return;
   state.selectedEvidence = ev;
 
-  const section = document.getElementById("evidenceDetailSection");
+  const section = getEl("evidenceDetailSection");
   section.classList.remove("hidden");
 
   renderEvidenceDetail(ev);
   section.scrollIntoView({ behavior: "smooth", block: "start" });
 };
 
-const closeEvidenceDetail = () => {
-  const section = document.getElementById("evidenceDetailSection");
+const closeEvidenceDetail = (): void => {
+  const section = getEl("evidenceDetailSection");
   section.classList.add("hidden");
   section.innerHTML = "";
   state.selectedEvidence = null;
 };
 
-// Registered ONCE on #evidenceDetailSection (see app.js); replaces the inline onclick="" attributes,
+// Registered ONCE on #evidenceDetailSection (see app.ts); replaces the inline onclick="" attributes,
 // which cannot see module-scoped functions.
-export const handleDetailClick = (event) => {
-  const actionEl = event.target.closest("[data-action]");
+export const handleDetailClick = (event: MouseEvent): void => {
+  if (!(event.target instanceof Element)) return;
+  const actionEl = event.target.closest<HTMLElement>("[data-action]");
   if (!actionEl) return;
   if (actionEl.dataset.action === "close-detail") closeEvidenceDetail();
   if (actionEl.dataset.action === "save-note") saveCurrentNote();
 };
 
-const renderEvidenceDetail = (ev) => {
-  const section = document.getElementById("evidenceDetailSection");
+const renderEvidenceDetail = (ev: Evidence): void => {
+  const section = getEl("evidenceDetailSection");
 
   const personNames = ev.personIds.map((id) => {
     const person = findPersonById(id);
@@ -353,31 +364,35 @@ const renderEvidenceDetail = (ev) => {
 
   section.innerHTML = html;
 
-  document
-    .getElementById("detailStatusSelect")
-    .addEventListener("change", (e) => {
-      ev.status = e.target.value; // direct mutation of the loaded evidence object
-      renderEvidenceDetail(ev);
-      if (state.viewRendered.evidence) renderEvidenceList();
-    });
-  document
-    .getElementById("detailRelevanceSelect")
-    .addEventListener("change", (e) => {
-      ev.relevance = e.target.value;
-      renderEvidenceDetail(ev);
-      if (state.viewRendered.evidence) renderEvidenceList();
-    });
+  const statusSelect = getEl("detailStatusSelect", HTMLSelectElement);
+  statusSelect.addEventListener("change", () => {
+    // The <option> values are exactly the EvidenceStatus values (see statusOptionHTML).
+    ev.status = statusSelect.value as EvidenceStatus; // direct mutation of the loaded evidence object
+    renderEvidenceDetail(ev);
+    if (state.viewRendered.evidence) renderEvidenceList();
+  });
+  const relevanceSelect = getEl("detailRelevanceSelect", HTMLSelectElement);
+  relevanceSelect.addEventListener("change", () => {
+    ev.relevance = relevanceSelect.value as EvidenceRelevance;
+    renderEvidenceDetail(ev);
+    if (state.viewRendered.evidence) renderEvidenceList();
+  });
 };
 
-const statusOptionHTML = (current, value, label) => {
-  const selected = (current || "").toLowerCase() === value ? " selected" : "";
+const statusOptionHTML = (
+  current: string,
+  value: string,
+  label: string,
+): string => {
+  const selected = current === value ? " selected" : "";
   return '<option value="' + value + '"' + selected + ">" + label + "</option>";
 };
 
-const saveCurrentNote = () => {
+const saveCurrentNote = (): void => {
   const textarea = document.getElementById("evidenceNoteInput");
-  if (!textarea) return;
-  const evidenceId = textarea.getAttribute("data-evidence-id"); // note id is read back off the DOM
+  if (!(textarea instanceof HTMLTextAreaElement)) return;
+  const evidenceId = textarea.dataset.evidenceId; // note id is read back off the DOM
+  if (!evidenceId) return;
   const text = textarea.value;
   saveNoteForEvidence(evidenceId, text);
   const preview = document.getElementById("notePreview");

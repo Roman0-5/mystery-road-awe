@@ -1,18 +1,25 @@
 import { state } from "./state.ts";
+import type { Certainty } from "./types.ts";
 import {
   findEvidenceById,
   findLocationById,
   formatDate,
   fillSelect,
+  getEl,
 } from "./utils.ts";
-import { navigateTo } from "./navigation.mjs";
-import { openEvidenceDetail } from "./evidence.mjs";
+import { navigateTo } from "./navigation.ts";
+import { openEvidenceDetail } from "./evidence.ts";
 
-export const populateTimelineDropdowns = () => {
+export const populateTimelineDropdowns = (): void => {
   const personSelect = document.getElementById("timelinePersonFilter");
   const locationSelect = document.getElementById("timelineLocationFilter");
   const typeSelect = document.getElementById("timelineTypeFilter");
-  if (!personSelect || !locationSelect || !typeSelect) return;
+  if (
+    !(personSelect instanceof HTMLSelectElement) ||
+    !(locationSelect instanceof HTMLSelectElement) ||
+    !(typeSelect instanceof HTMLSelectElement)
+  )
+    return;
 
   fillSelect(
     personSelect,
@@ -33,23 +40,29 @@ export const populateTimelineDropdowns = () => {
   );
 };
 
-const certaintyBadgeClass = (certainty) => {
-  if (certainty === "confirmed") return "reviewed";
-  if (certainty === "contradictory") return "critical";
-  if (certainty === "reported") return "flagged";
-  return "unreviewed";
+// Exhaustive on purpose: adding a Certainty value without a badge is a compile error.
+const certaintyBadgeClass = (certainty: Certainty): string => {
+  switch (certainty) {
+    case "confirmed":
+      return "reviewed";
+    case "contradictory":
+      return "critical";
+    case "reported":
+      return "flagged";
+  }
 };
 
-export function renderTimeline() {
+export function renderTimeline(): void {
   const container = document.getElementById("timelineContainer");
   if (!container) return;
 
-  const order = document.getElementById("timelineOrder").value;
-  const personFilter = document.getElementById("timelinePersonFilter").value;
-  const locationFilter = document.getElementById(
+  const order = getEl("timelineOrder", HTMLSelectElement).value;
+  const personFilter = getEl("timelinePersonFilter", HTMLSelectElement).value;
+  const locationFilter = getEl(
     "timelineLocationFilter",
+    HTMLSelectElement,
   ).value;
-  const typeFilter = document.getElementById("timelineTypeFilter").value;
+  const typeFilter = getEl("timelineTypeFilter", HTMLSelectElement).value;
 
   const events = state.allTimeline
     .filter((evt) => {
@@ -60,7 +73,7 @@ export function renderTimeline() {
       return true;
     })
     .sort((a, b) => {
-      const diff = new Date(a.time) - new Date(b.time);
+      const diff = new Date(a.time).getTime() - new Date(b.time).getTime();
       return order === "desc" ? -diff : diff;
     });
 
@@ -106,23 +119,25 @@ export function renderTimeline() {
 
   container.querySelectorAll(".evidence-link-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      openEvidenceModal(e.target.getAttribute("data-evidence-id"));
+      if (!(e.target instanceof HTMLElement)) return;
+      openEvidenceModal(e.target.dataset.evidenceId ?? "");
     });
   });
 }
 
 // --- Quick-view modal (used from the timeline) -------------------------
 
-const handleModalClick = (e) => {
+const handleModalClick = (e: MouseEvent): void => {
   const modal = document.getElementById("quickViewModal");
+  if (!modal || !(e.target instanceof HTMLElement)) return;
   if (
     e.target.classList.contains("modal-close-btn") ||
     e.target.classList.contains("modal-backdrop")
   ) {
     modal.innerHTML = "";
   }
-  if (e.target.getAttribute && e.target.getAttribute("data-open-full")) {
-    const evidenceId = e.target.getAttribute("data-open-full");
+  const evidenceId = e.target.dataset.openFull;
+  if (evidenceId) {
     modal.innerHTML = "";
     navigateTo("evidence");
     setTimeout(() => {
@@ -131,7 +146,7 @@ const handleModalClick = (e) => {
   }
 };
 
-const openEvidenceModal = (evidenceId) => {
+const openEvidenceModal = (evidenceId: string): void => {
   const ev = findEvidenceById(evidenceId);
   if (!ev) return;
 
